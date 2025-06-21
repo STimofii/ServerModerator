@@ -44,7 +44,7 @@ public class Bot extends TelegramLongPollingBot {
                 long chat_id = message.getChatId();
                 long user_id = message.getFrom().getId();
                 SendMessage sendMessage = new SendMessage();
-                sendMessage.setChatId(chat_id);
+                sendMessage.setChatId(Long.valueOf(chat_id));
                 sendMessage.setText("I`m working!");
                 sendMessage(sendMessage);
             }
@@ -58,7 +58,7 @@ public class Bot extends TelegramLongPollingBot {
                 if(user_id != myID)
                     return;
                 SendMessage sendMessage = new SendMessage();
-                sendMessage.setChatId(chat_id);
+                sendMessage.setChatId(Long.valueOf(chat_id));
                 sendMessage.setText("Rebooting!");
                 sendMessage(sendMessage);
                 logger.log(Level.SEVERE, "!!!Got command - REBOOT!!!. From " + user_id);
@@ -66,7 +66,7 @@ public class Bot extends TelegramLongPollingBot {
                     reboot();
                 } catch (Exception e) {
                     logger.log(Level.SEVERE, "!!!CAN`T REBOOT SYSTEM!!!", e);
-                    sendMessage.setChatId(chat_id);
+                    sendMessage.setChatId(Long.valueOf(chat_id));
                     sendMessage.setText("Can`t reboot!\n" + e.getMessage());
                     sendMessage(sendMessage);
                 }
@@ -191,7 +191,7 @@ public class Bot extends TelegramLongPollingBot {
 
     public void sendMessage(long chatID, String text) {
         SendMessage sendMessage = new SendMessage();
-        sendMessage.setChatId(chatID);
+        sendMessage.setChatId(Long.valueOf(chatID));
         sendMessage.setText(text);
         try {
             execute(sendMessage);
@@ -212,8 +212,8 @@ public class Bot extends TelegramLongPollingBot {
 
     public void editMessage(long chatID, int messageID, String text, InlineKeyboardMarkup markup) {
         EditMessageText editMessageText = new EditMessageText();
-        editMessageText.setChatId(chatID);
-        editMessageText.setMessageId(messageID);
+        editMessageText.setChatId(Long.valueOf(chatID));
+        editMessageText.setMessageId(Integer.valueOf(messageID));
         editMessageText.setText(text);
         editMessageText.setReplyMarkup(markup);
         try {
@@ -235,8 +235,8 @@ public class Bot extends TelegramLongPollingBot {
 
     public void deleteMessage(long chatID, int messageID) {
         DeleteMessage deleteMessage = new DeleteMessage();
-        deleteMessage.setChatId(chatID);
-        deleteMessage.setMessageId(messageID);
+        deleteMessage.setChatId(Long.valueOf(chatID));
+        deleteMessage.setMessageId(Integer.valueOf(messageID));
         try {
             execute(deleteMessage);
         } catch (Exception e) {
