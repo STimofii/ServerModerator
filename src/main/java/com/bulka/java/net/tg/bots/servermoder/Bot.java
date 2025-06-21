@@ -78,6 +78,11 @@ public class Bot extends TelegramLongPollingBot {
     public void postInit(){
         scheduler.scheduleAtFixedRate(this::checkTelegramApiStatus, 0, CHECK_INTERVAL_SECONDS, TimeUnit.SECONDS);
 
+
+        SendMessage sendMessage = new SendMessage();
+        sendMessage.setChatId(myID);
+        sendMessage.setText("I`m started!");
+        sendMessage(sendMessage);
     }
 
     public void checkTelegramApiStatus() {
@@ -259,7 +264,7 @@ public class Bot extends TelegramLongPollingBot {
         Process process = Runtime.getRuntime().exec("shutdown /r /t 0 /f");
     }
     public void rebootLinux() throws IOException {
-        Process process = Runtime.getRuntime().exec("shutdown -r now");
+        Process process = Runtime.getRuntime().exec("sudo reboot");
     }
 
     @Override
