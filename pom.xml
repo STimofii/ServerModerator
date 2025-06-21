@@ -54,7 +54,7 @@
                             <goal>unpack-dependencies</goal>
                         </goals>
                         <configuration>
-                            <includeArtifactIds>mylib</includeArtifactIds>
+                            <includeArtifactIds>brul</includeArtifactIds>
                             <outputDirectory>${project.build.directory}/classes</outputDirectory>
                         </configuration>
                     </execution>
