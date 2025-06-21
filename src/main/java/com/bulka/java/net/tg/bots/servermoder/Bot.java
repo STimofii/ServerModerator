@@ -2,6 +2,7 @@ package com.bulka.java.net.tg.bots.servermoder;
 
 import org.telegram.telegrambots.bots.DefaultBotOptions;
 import org.telegram.telegrambots.bots.TelegramLongPollingBot;
+import org.telegram.telegrambots.meta.api.methods.GetMe;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 import org.telegram.telegrambots.meta.api.methods.updatingmessages.DeleteMessage;
 import org.telegram.telegrambots.meta.api.methods.updatingmessages.EditMessageText;
@@ -10,8 +11,15 @@ import org.telegram.telegrambots.meta.api.objects.Update;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.InlineKeyboardMarkup;
 
 import java.io.IOException;
+import java.net.InetSocketAddress;
+import java.net.Socket;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Timer;
+import java.util.TimerTask;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -21,6 +29,8 @@ public class Bot extends TelegramLongPollingBot {
     private long myID;
     private final HashMap<String, Command> commands = new HashMap<>();
     public String osName = System.getProperty("os.name");
+    private static final long CHECK_INTERVAL_SECONDS = 60;
+    private ScheduledExecutorService scheduler = Executors.newSingleThreadScheduledExecutor();
 
     public Bot(DefaultBotOptions defaultBotOptions, String token, String username, long myID) {
         super(defaultBotOptions, token);
@@ -66,7 +76,39 @@ public class Bot extends TelegramLongPollingBot {
     }
 
     public void postInit(){
+        scheduler.scheduleAtFixedRate(this::checkTelegramApiStatus, 0, CHECK_INTERVAL_SECONDS, TimeUnit.SECONDS);
 
+    }
+
+    public void checkTelegramApiStatus() {
+        boolean ping = ping();
+        if(!ping) {
+            logger.log(Level.SEVERE, "No network!!!");
+            return;
+        }
+        try {
+            GetMe getMe = new GetMe();
+            execute(getMe);
+            logger.fine("Bot working normal, no problems with network");
+        } catch (Exception e) {
+            logger.log(Level.SEVERE, "Telegram api error ", e);
+            logger.log(Level.SEVERE, "Restarting bot!");
+            System.exit(1);
+        }
+
+    }
+
+    public boolean ping(){
+        return isHostAvailable("8.8.8.8", 53, 10_000);
+    }
+
+    public boolean isHostAvailable(String host, int port, int timeout) {
+        try (Socket socket = new Socket()) {
+            socket.connect(new InetSocketAddress(host, port), timeout);
+            return true;
+        } catch (Exception e) {
+            return false;
+        }
     }
 
     @Override
